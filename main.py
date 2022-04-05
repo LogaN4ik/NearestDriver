@@ -3,6 +3,7 @@ import requests
 import folium
 import time
 from folium.plugins import HeatMap
+#test branch
 #           lat             lon
 #norilsk 69.346        88.21
 #valek   69.4          88.36
