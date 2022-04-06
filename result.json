@@ -1,37 +1,9 @@
 [
     {
-        "driver_id": "c1531c9e539207663425690253ff96e0",
+        "driver_id": "1e5324446ec442a8bcfd5b9b2c472aa3",
         "driver_tariff": "econom",
-        "driver_position_lon": 88.382334,
-        "driver_position_lat": 69.491375,
-        "driver_position_timestamp": "2022-04-05T05:57:26.000000+0000"
-    },
-    {
-        "driver_id": "598d3fb0a27c396f857774c0721310c4",
-        "driver_tariff": "econom",
-        "driver_position_lon": 88.390874,
-        "driver_position_lat": 69.488257,
-        "driver_position_timestamp": "2022-04-05T05:57:17.000000+0000"
-    },
-    {
-        "driver_id": "42f7a5118f306f9d91aeef660522254b",
-        "driver_tariff": "econom",
-        "driver_position_lon": 88.395268,
-        "driver_position_lat": 69.490254,
-        "driver_position_timestamp": "2022-04-05T05:57:24.000000+0000"
-    },
-    {
-        "driver_id": "910ff56bf1b3edab4efa6546e349566a",
-        "driver_tariff": "econom",
-        "driver_position_lon": 88.395131,
-        "driver_position_lat": 69.490282,
-        "driver_position_timestamp": "2022-04-05T05:57:17.000000+0000"
-    },
-    {
-        "driver_id": "cd1d2210cba865f2490c1c3beefa53e6",
-        "driver_tariff": "econom",
-        "driver_position_lon": 88.396525,
-        "driver_position_lat": 69.484125,
-        "driver_position_timestamp": "2022-04-05T05:57:14.000000+0000"
+        "driver_position_lon": 88.169187,
+        "driver_position_lat": 69.331257,
+        "driver_position_timestamp": "2022-04-06T16:32:01.000000+0000"
     }
 ]

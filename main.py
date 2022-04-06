@@ -3,15 +3,14 @@ import requests
 import folium
 import time
 from folium.plugins import HeatMap
-#test branch
+#test branch. Funcs args of coord add
 #           lat             lon
 #norilsk 69.346        88.21
 #valek   69.4          88.36
 #talnakh 69.49         88.38
 
-def collect_data():
-    our_lat = 69.49
-    our_lon = 88.38
+
+def collect_data(our_lat, our_lon):
     result = [] # create a list cuz error
     url = 'https://ya-authproxy.taxi.yandex.ru/integration/turboapp/v1/nearestdrivers' # url for POST
     #send POST body parametres
@@ -23,7 +22,6 @@ def collect_data():
         "simplify": True})
     data_source = response.json()
     print(str(len(data_source.get('drivers'))) + ' drivers') #count of nearest drivers
-    #print(data)
     data_drivers = data_source.get('drivers')
     for i in data_drivers:  #for each driver in json we will get only intereting for us info
         driver_id = i.get('id')
@@ -63,17 +61,21 @@ def collect_coord():
         map_data = map_data + [map_data_temp]
     return(map_data)
 
-def map_generate():
-    our_location = [69.49, 88.38]
-    mapObj = folium.Map(location=our_location, zoom_start=13)
+def map_generate(map_centre):
+    mapObj = folium.Map(location=map_centre, zoom_start=9.4)
     HeatMap(collect_coord()).add_to(mapObj)
     mapObj.save("map_norilsk.html")
 
 def main():
     while(True):
-        collect_data()
-        map_generate()
-        time.sleep(20)
+        lat_list = [69.49, 69.4, 69.346]
+        lon_list = [88.38, 88.36, 88.21]
+        print(lat_list[0])
+        our_lat = lat_list[2]
+        our_lon = lon_list[2]
+        collect_data(our_lat, our_lon)
+        map_generate([69.4, 87.4])
+        time.sleep(6)
 
 if __name__ == '__main__':
     main()
