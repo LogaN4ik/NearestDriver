@@ -38,13 +38,16 @@ def collect_data(our_lat, our_lon):
                 'driver_position_timestamp': driver_position_timestamp
             }
         )
-    with open('result.json', 'w') as file: #write drivers info into result.json
-        json.dump(result, file, indent=4, ensure_ascii=False)
+    #with open('result.json', 'w') as file: #write drivers info into result.json
+    #    json.dump(result, file, indent=4, ensure_ascii=False)
+    #print('result= ', result)
+    return result
 
 def collect_coord():
-    with open('result.json') as file:   # read result.json
+    #with open('result.json') as file:   # read result.json
+    with open('alldata.json') as file:   # read result.json
         drivers_info = json.load(file)
-    print('all drivers info: ', drivers_info)
+    #print('all drivers info: ', drivers_info)
     print(len(drivers_info))
 
     lats = []
@@ -59,6 +62,7 @@ def collect_coord():
     for i, val in enumerate(lats):  #create data list for map generating like [lat, lon, warm]
         map_data_temp = [lats[i] , lons[i] , warm]
         map_data = map_data + [map_data_temp]
+    print(map_data)
     return(map_data)
 
 def map_generate(map_centre):
@@ -68,12 +72,23 @@ def map_generate(map_centre):
 
 def main():
     while(True):
-        lat_list = [69.49, 69.4, 69.346]
-        lon_list = [88.38, 88.36, 88.21]
-        print(lat_list[0])
-        our_lat = lat_list[2]
-        our_lon = lon_list[2]
-        collect_data(our_lat, our_lon)
+        lat_list = [69.346, 69.367273]
+        lon_list = [88.21, 88.163294]
+        all_data = []
+        for i, val in enumerate(lat_list):
+            data = collect_data(lat_list[i], lon_list[i])
+            all_data = all_data + data
+            print(i, lat_list[i], lon_list[i])
+            print('collect data = ', data)
+        print('all data = ',all_data)
+
+        d = {}
+        for x in all_data:
+            d[x['driver_id']] = x
+        all_data = list((d.values()))
+
+        with open('alldata.json', 'w') as file:
+            json.dump(all_data, file, indent=4, ensure_ascii=False)
         map_generate([69.4, 87.4])
         time.sleep(6)
 
