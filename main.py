@@ -2,6 +2,7 @@ import json
 import requests
 import folium
 import time
+import coord_generator
 from folium.plugins import HeatMap
 #           lat             lon
 #norilsk 69.346        88.21
@@ -65,8 +66,12 @@ def map_generate(map_centre):
 
 def main():
     while(True):
-        lat_list = [69.346, 69.367273]
-        lon_list = [88.21, 88.163294]
+        norilsk_lats = coord_generator.get_lats(69.340, 69.365, 88.150, 88.255)
+        norilsk_lons = coord_generator.get_lons(69.340, 69.365, 88.150, 88.255)
+        talnakh_lats = coord_generator.get_lats(69.48, 69.505, 88.36, 88.41)
+        talnakh_lons = coord_generator.get_lons(69.48, 69.505, 88.36, 88.41)
+        lat_list = norilsk_lats + talnakh_lats
+        lon_list = norilsk_lons + talnakh_lons
         all_data = []
         for i, val in enumerate(lat_list):
             data = collect_data(lat_list[i], lon_list[i])
