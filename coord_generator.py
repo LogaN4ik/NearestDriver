@@ -1,6 +1,6 @@
 from numpy import arange
 
-step = 0.005
+step = 0.01
 
 
 def get_lons(lat_start, lat_stop, lon_start, lon_stop):
