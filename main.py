@@ -4,6 +4,9 @@ import folium
 import time
 import coord_generator
 from folium.plugins import HeatMap
+from pyfiglet import Figlet
+
+print(Figlet(font='small').renderText('Nearest Driver     0.1'))  # preview
 #           lat             lon
 #norilsk 69.346        88.21
 #valek   69.4          88.36

@@ -1,11 +1,13 @@
 from numpy import arange
 
+step = 0.005
+
 
 def get_lons(lat_start, lat_stop, lon_start, lon_stop):
     lat_delta = round(lat_start - lat_stop, 3)
     lon_delta = round(lon_start - lon_stop, 3)
-    lat_count = round(lat_delta / 0.005)
-    lon_count = round(lon_delta / 0.005)
+    lat_count = round(lat_delta / step)
+    lon_count = round(lon_delta / step)
 
     # print(lat_count, 'vert line')
     # print(lon_count, 'horizon line')
@@ -14,11 +16,11 @@ def get_lons(lat_start, lat_stop, lon_start, lon_stop):
     lons = []
     lats = []
 
-    for i in arange(lon_start, lon_stop, 0.005):
+    for i in arange(lon_start, lon_stop, step):
         lon = [round(i, 3)]
         lons = lons + lon
 
-    for i in arange(lat_start, lat_stop, 0.005):
+    for i in arange(lat_start, lat_stop, step):
         lat = [round(i, 3)]
         lats = lats + lat
 
@@ -50,8 +52,8 @@ def get_lons(lat_start, lat_stop, lon_start, lon_stop):
 def get_lats(lat_start, lat_stop, lon_start, lon_stop):
     lat_delta = round(lat_start - lat_stop, 3)
     lon_delta = round(lon_start - lon_stop, 3)
-    lat_count = round(lat_delta / 0.005)
-    lon_count = round(lon_delta / 0.005)
+    lat_count = round(lat_delta / step)
+    lon_count = round(lon_delta / step)
 
     # print(lat_count, 'vert line')
     # print(lon_count, 'horizon line')
@@ -60,11 +62,11 @@ def get_lats(lat_start, lat_stop, lon_start, lon_stop):
     lons = []
     lats = []
 
-    for i in arange(lon_start, lon_stop, 0.005):
+    for i in arange(lon_start, lon_stop, step):
         lon = [round(i, 3)]
         lons = lons + lon
 
-    for i in arange(lat_start, lat_stop, 0.005):
+    for i in arange(lat_start, lat_stop, step):
         lat = [round(i, 3)]
         lats = lats + lat
 
