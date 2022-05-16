@@ -1,7 +1,6 @@
 import json
 import requests
 import folium
-import time
 import coord_generator
 from folium.plugins import HeatMap
 from pyfiglet import Figlet
@@ -61,36 +60,40 @@ def collect_coord():
 
 
 def map_generate(map_centre):
-    mapobj = folium.Map(location=map_centre, zoom_start=6)
+    mapobj = folium.Map(location=map_centre, zoom_start=13)
     HeatMap(collect_coord()).add_to(mapobj)
-    mapobj.save("/var/www/html/map_norilsk.html")
+    mapobj.save("map_norilsk.html")  # /var/www/html/map_norilsk.html
 
 
 def main():
-    while True:
-        norilsk_lats = coord_generator.get_lats(69.340, 69.365, 88.150, 88.255)
-        norilsk_lons = coord_generator.get_lons(69.340, 69.365, 88.150, 88.255)
-        talnakh_lats = coord_generator.get_lats(69.48, 69.505, 88.36, 88.41)
-        talnakh_lons = coord_generator.get_lons(69.48, 69.505, 88.36, 88.41)
-        lat_list = norilsk_lats + talnakh_lats
-        lon_list = norilsk_lons + talnakh_lons
-        all_data = []
-        for i, val in enumerate(lat_list):
-            data = collect_data(lat_list[i], lon_list[i])
-            all_data = all_data + data
-            print("\n #", i, "coordinate of nearest drivers: ", lat_list[i], lon_list[i])
-            print('collected data from coordinate = ', data)
-        print('\n all data = ', all_data)
+    norilsk_lats = coord_generator.get_lats(69.340, 69.365, 88.150, 88.255)
+    norilsk_lons = coord_generator.get_lons(69.340, 69.365, 88.150, 88.255)
+    talnakh_lats = coord_generator.get_lats(69.48, 69.505, 88.36, 88.41)
+    talnakh_lons = coord_generator.get_lons(69.48, 69.505, 88.36, 88.41)
+    lat_list = norilsk_lats + talnakh_lats
+    lon_list = norilsk_lons + talnakh_lons
+    all_data = []
+    for i, val in enumerate(lat_list):
+        data = collect_data(lat_list[i], lon_list[i])
+        all_data = all_data + data
+        print("\n #", i, "coordinate of nearest drivers: ", lat_list[i], lon_list[i])
+        print('collected data from coordinate = ', data)
+    # print('\n all data = ', all_data)
 
-        d = {}
-        for x in all_data:
-            d[x['driver_id']] = x
-        all_data = list((d.values()))
+    d = {}
+    for x in all_data:
+        d[x['driver_id']] = x
+    all_data = list((d.values()))
+    free_drivers = len(all_data)
+    drivers = {'free_drivers_at_region': free_drivers}
+    j = json.dumps(drivers)  # save output in json files
+    with open('drivers.json', 'w', encoding='utf-8') as f:  # '/var/www/html/drivers.json'
+        f.write(j)
+        f.close()
 
-        with open('alldata.json', 'w') as file:
-            json.dump(all_data, file, indent=4, ensure_ascii=False)
-        map_generate([69.353, 88.2])
-        time.sleep(6)
+    with open('alldata.json', 'w') as file:
+        json.dump(all_data, file, indent=4, ensure_ascii=False)
+    map_generate([69.353, 88.2])
 
 
 if __name__ == '__main__':
