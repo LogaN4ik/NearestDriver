@@ -5,7 +5,7 @@ import coord_generator
 from folium.plugins import HeatMap
 from pyfiglet import Figlet
 
-print(Figlet(font='small').renderText('Nearest Driver     0.1'))  # preview
+print(Figlet(font='small').renderText('Nearest Driver     0.3'))  # preview
 
 
 def collect_data(our_lat, our_lon):
