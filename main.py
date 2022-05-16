@@ -61,9 +61,9 @@ def collect_coord():
 
 
 def map_generate(map_centre):
-    mapobj = folium.Map(location=map_centre, zoom_start=9.4)
+    mapobj = folium.Map(location=map_centre, zoom_start=6)
     HeatMap(collect_coord()).add_to(mapobj)
-    mapobj.save("map_norilsk.html")
+    mapobj.save("/var/www/html/map_norilsk.html")
 
 
 def main():
@@ -89,7 +89,7 @@ def main():
 
         with open('alldata.json', 'w') as file:
             json.dump(all_data, file, indent=4, ensure_ascii=False)
-        map_generate([69.4, 87.4])
+        map_generate([69.353, 88.2])
         time.sleep(6)
 
 
