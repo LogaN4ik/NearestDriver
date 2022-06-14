@@ -2,30 +2,38 @@ import json
 import requests
 import folium
 import coord_generator
+import pandas as pd
 from folium.plugins import HeatMap
 from pyfiglet import Figlet
+from loguru import logger
+logger.add('debug.log', format='{time} {level} {message}', level='DEBUG', rotation='10 MB', compression='zip')
 
-print(Figlet(font='small').renderText('Nearest Driver     0.3'))  # preview
+print(Figlet(font='small').renderText('Nearest Driver     0.6'))  # preview
+
+norilsk = ['norilsk', 69.340, 69.365, 88.150, 88.255]
+talnah = ['talnah', 69.48, 69.505, 88.36, 88.41]
+dudinka = ['dudinka', 69.400, 69.420, 86.155, 86.230]  # 69.420 86.155    69.400 86.230
+kayerkan = ['kayerkan', 69.340, 69.360, 87.740, 87.770]  # 69.360 87.740    69.340 87.770
 
 
-def collect_data(our_lat, our_lon):
+@logger.catch
+def parse_data(our_lat, our_lon):
     result = []  # create a list cuz error
     url = 'https://ya-authproxy.taxi.yandex.ru/integration/turboapp/v1/nearestdrivers'  # url for POST
-    # send POST body parametres
+    # send POST body parameters
     response = requests.post(url, json={
         "point": [our_lon, our_lat],  # our position
         "classes": ["econom"],
         "current_drivers": [],
         "is_retro": True,
         "simplify": True})
-    data_source = response.json()
-    data_drivers = data_source.get('drivers')
-    for i in data_drivers:  # for each driver in json we will get only interesting for us info
-        driver_id = i.get('id')
-        driver_tariff = i.get('display_tariff')
-        driver_position_lon = i.get('positions')[0].get('lon')
-        driver_position_lat = i.get('positions')[0].get('lat')
-        driver_position_timestamp = i.get('positions')[0].get('timestamp')
+    data_drivers = response.json().get('drivers')
+    for driver in (data_drivers or []):  # for each driver in json we will get only interesting for us info
+        driver_id = driver.get('id')
+        driver_tariff = driver.get('display_tariff')
+        driver_position_lon = driver.get('positions')[0].get('lon')
+        driver_position_lat = driver.get('positions')[0].get('lat')
+        driver_position_timestamp = driver.get('positions')[0].get('timestamp')
         result.append(
             {
                 'driver_id': driver_id,
@@ -38,10 +46,11 @@ def collect_data(our_lat, our_lon):
     return result
 
 
-def collect_coord():
-    with open('alldata.json') as file:  # read result.json
-        drivers_info = json.load(file)
-    print(len(drivers_info), "records of drivers info")
+@logger.catch
+def map_coords():
+    with open('geodata.json') as file:  # read
+        drivers_info = json.load(file).get('data')[0]
+    logger.debug(f'{len(drivers_info)} records of drivers info')
 
     lats = []
     lons = []
@@ -55,46 +64,71 @@ def collect_coord():
     for i, val in enumerate(lats):  # create data list for map generating like [lat, lon, warm]
         map_data_temp = [lats[i], lons[i], warm]
         map_data = map_data + [map_data_temp]
-    print(map_data)
+    logger.debug(map_data)
     return map_data
 
 
-def map_generate(map_centre):
-    mapobj = folium.Map(location=map_centre, zoom_start=13)
-    HeatMap(collect_coord()).add_to(mapobj)
-    mapobj.save("map_norilsk.html")  # /var/www/html/map_norilsk.html
+@logger.catch
+def map_generate():
+    map_centre = [69.35999, 87.21222]
+    map_object = folium.Map(location=map_centre, zoom_start=9)
+    HeatMap(map_coords()).add_to(map_object)
+    map_object.save("/var/www/html/map_norilsk.html")  # /var/www/html/map_norilsk.html
+    logger.debug('Map saved')
 
 
-def main():
-    norilsk_lats = coord_generator.get_lats(69.340, 69.365, 88.150, 88.255)
-    norilsk_lons = coord_generator.get_lons(69.340, 69.365, 88.150, 88.255)
-    talnakh_lats = coord_generator.get_lats(69.48, 69.505, 88.36, 88.41)
-    talnakh_lons = coord_generator.get_lons(69.48, 69.505, 88.36, 88.41)
-    lat_list = norilsk_lats + talnakh_lats
-    lon_list = norilsk_lons + talnakh_lons
-    all_data = []
-    for i, val in enumerate(lat_list):
-        data = collect_data(lat_list[i], lon_list[i])
-        all_data = all_data + data
-        print("\n #", i, "coordinate of nearest drivers: ", lat_list[i], lon_list[i])
-        print('collected data from coordinate = ', data)
-    # print('\n all data = ', all_data)
+@logger.catch
+def get_free_drivers(region):
+    region_scan_lats = coord_generator.get_lats(region[1], region[2], region[3], region[4])
+    regions_scan_lons = coord_generator.get_lons(region[1], region[2], region[3], region[4])
+    geo_data = []  # create empty list
+    for i, val in enumerate(region_scan_lats):
+        data = parse_data(region_scan_lats[i], regions_scan_lons[i])
+        if data is not None:
+            geo_data = geo_data + data
+            logger.info(f"{region[0]} scan {i}, scan for:{region_scan_lats[i]}, {regions_scan_lons[i]}, data: {data}")
 
     d = {}
-    for x in all_data:
+    for x in geo_data:
         d[x['driver_id']] = x
-    all_data = list((d.values()))
-    free_drivers = len(all_data)
+    geo_data = list((d.values()))
+    free_drivers = len(geo_data)
     drivers = {'free_drivers_at_region': free_drivers}
     j = json.dumps(drivers)  # save output in json files
-    with open('drivers.json', 'w', encoding='utf-8') as f:  # '/var/www/html/drivers.json'
+    with open('/var/www/html/' + region[0] + '_drivers.json', 'w', encoding='utf-8') as f: # '/var/www/html/' + region[0] + '_drivers.json'
         f.write(j)
         f.close()
+    if free_drivers > 0:
+        with open((region[0] + '_geodata.json'), 'w') as f:
+            json.dump(geo_data, f, indent=4, ensure_ascii=False)
+    else:
+        with open((region[0] + '_geodata.json'), 'w') as f:
+            f.write('[]')
 
-    with open('alldata.json', 'w') as file:
-        json.dump(all_data, file, indent=4, ensure_ascii=False)
-    map_generate([69.353, 88.2])
+
+@logger.catch
+def concat_geo_json():
+    with open('kayerkan_geodata.json') as f1:  # open the file
+        data1 = json.load(f1)
+    with open('dudinka_geodata.json') as f2:  # open the file
+        data2 = json.load(f2)
+    with open('talnah_geodata.json') as f3:  # open the file
+        data3 = json.load(f3)
+    with open('norilsk_geodata.json') as f4:  # open the file
+        data4 = json.load(f4)
+    df1 = pd.DataFrame([data1])  # Creating DataFrames
+    df2 = pd.DataFrame([data2])  # Creating DataFrames
+    df3 = pd.DataFrame([data3])  # Creating DataFrames
+    df4 = pd.DataFrame([data4])  # Creating DataFrames
+    merge_json = pd.concat([df1, df2, df3, df4], axis=1)  # Concat DataFrames
+    merge_json.to_json("geodata.json", orient='split')  # Writing Json , orient='split'
 
 
 if __name__ == '__main__':
-    main()
+    get_free_drivers(kayerkan)
+    get_free_drivers(dudinka)
+    get_free_drivers(talnah)
+    get_free_drivers(norilsk)
+    concat_geo_json()
+    map_generate()
+

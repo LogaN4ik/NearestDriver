@@ -1,2 +1,7 @@
-# NearestDriver v 0.1
-Monitoring vehicle without client
+# NearestDriver v 0.5
+Monitoring free vehicle
+City:
+    -norilsk
+    -talnah
+    -dudinka
+    -kayerkan
