@@ -1,13 +1,9 @@
-# NearestDriver v 0.6
-Monitoring free vehicle
-Count:
+# NearestDriver v 0.7
+*Monitoring free vehicle*
+
+Count, Map & PopUp:
     norilsk
     talnah
     dudinka
     kayerkan
 
-Map:
-    norilsk
-    talnah
-    dudinka
-    kayerkan
