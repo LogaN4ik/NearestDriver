@@ -4,12 +4,14 @@ import folium
 import coord_generator
 import pandas as pd
 from folium.plugins import HeatMap
-import folium
+from folium.plugins import MousePosition
+from folium.plugins import MeasureControl
 from pyfiglet import Figlet
 from loguru import logger
+
 logger.add('debug.log', format='{time} {level} {message}', level='DEBUG', rotation='10 MB', compression='zip')
 
-print(Figlet(font='small').renderText('Nearest Driver     0.7'))  # preview
+print(Figlet(font='small').renderText('Nearest Driver     0.8'))  # preview
 
 norilsk = ['norilsk', 69.340, 69.365, 88.150, 88.255]
 talnah = ['talnah', 69.48, 69.505, 88.36, 88.41]
@@ -75,11 +77,22 @@ def map_generate():
     map_object = folium.Map(location=map_centre, zoom_start=9)
     HeatMap(map_coords()).add_to(map_object)
     # folium.map.LayerControl('topleft', collapsed=False).add_to
+
+    #  Generating squares
     gj_norilsk = folium.GeoJson(data={'type': 'Polygon', 'coordinates': [[[88.150, 69.340], [88.255, 69.340], [88.255, 69.365], [88.150, 69.365]]]})
+
     gj_talnah = folium.GeoJson(data={'type': 'Polygon', 'coordinates': [[[88.36, 69.48], [88.41, 69.48], [88.41, 69.505], [88.36, 69.505]]]})
     gj_dudinka = folium.GeoJson(data={'type': 'Polygon', 'coordinates': [[[86.155, 69.4], [86.23, 69.4], [86.23, 69.42], [86.155, 69.42]]]})
     gj_kayerkan = folium.GeoJson(data={'type': 'Polygon', 'coordinates': [[[87.74, 69.34], [87.77, 69.34], [87.77, 69.36], [87.74, 69.36]]]})
     gj_norilsk.add_to(map_object), gj_talnah.add_to(map_object), gj_dudinka.add_to(map_object), gj_kayerkan.add_to(map_object)
+
+    gj_norilsk.add_child(folium.Popup(f' Свободных машин: -'))
+    gj_talnah.add_child(folium.Popup(f' Свободных машин: -'))
+    gj_kayerkan.add_child(folium.Popup(f' Свободных машин: -'))
+    gj_dudinka.add_child(folium.Popup(f' Свободных машин: -'))
+
+    MousePosition().add_to(map_object)  # mouse pos to corner on map
+    map_object.add_child(MeasureControl())  # measure at map
     map_object.save("map_norilsk.html")  # /var/www/html/map_norilsk.html
     logger.debug('Map saved')
 
@@ -132,10 +145,10 @@ def concat_geo_json():
 
 
 if __name__ == '__main__':
-    #get_free_drivers(kayerkan)
-    #get_free_drivers(dudinka)
-    #get_free_drivers(talnah)
-    #get_free_drivers(norilsk)
+    get_free_drivers(kayerkan)
+    get_free_drivers(dudinka)
+    get_free_drivers(talnah)
+    get_free_drivers(norilsk)
     concat_geo_json()
     map_generate()
 
